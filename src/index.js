@@ -4,11 +4,6 @@ import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-let simplLightboxGallery = new SimpleLightbox('.gallery a', {
-  captions: true,
-  captionsData: 'alt',
-  captionDelay: 250,
-});
 const refs = {
   form: document.querySelector('#search-form'),
   gallery: document.querySelector('.gallery'),
@@ -17,7 +12,7 @@ const refs = {
 const imagesRendering = obj => {
   const imageCard = obj.data.hits
     .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
-      return `<a class="photo-card" href = "${largeImageURL}"><div>
+      return `<a class="photo-card" href = "${largeImageURL}">
   <img src="${webformatURL}" alt="${tags}" loading="lazy" width = "370px"/>
   <div class="info">
     <p class="info-item">
@@ -37,7 +32,7 @@ const imagesRendering = obj => {
       ${downloads}
     </p>
   </div>
-</div></a>`;
+</a>`;
     })
     .join('');
 
