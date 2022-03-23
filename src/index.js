@@ -1,17 +1,23 @@
 import './sass/main.scss';
 import { fetchImages } from './fetchImages';
 import Notiflix from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
+let simplLightboxGallery = new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 const refs = {
   form: document.querySelector('#search-form'),
   gallery: document.querySelector('.gallery'),
-  card: document.querySelector('.photo-card')
 };
 
 const imagesRendering = obj => {
   const imageCard = obj.data.hits
-    .map(({ webformatURL, tags, likes, views, comments, downloads }) => {
-      return `<div class="photo-card">
+    .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
+      return `<a class="photo-card" href = "${largeImageURL}"><div>
   <img src="${webformatURL}" alt="${tags}" loading="lazy" width = "370px"/>
   <div class="info">
     <p class="info-item">
@@ -31,7 +37,7 @@ const imagesRendering = obj => {
       ${downloads}
     </p>
   </div>
-</div>`;
+</div></a>`;
     })
     .join('');
 
@@ -43,7 +49,8 @@ const imagesRendering = obj => {
   }
 
   refs.gallery.innerHTML = imageCard;
-  console.log(refs.card);
+
+  // console.log(refs.card);
 };
 
 const submit = e => {
