@@ -9,10 +9,14 @@ const refs = {
   gallery: document.querySelector('.gallery'),
 };
 
+
+
+
+
 const imagesRendering = obj => {
   const imageCard = obj.data.hits
     .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
-      return `<a class="photo-card" href = "${largeImageURL}">
+      return `<a class="gallery__item" href = "${largeImageURL}">
   <img src="${webformatURL}" alt="${tags}" loading="lazy" width = "370px"/>
   <div class="info">
     <p class="info-item">
@@ -31,8 +35,7 @@ const imagesRendering = obj => {
       <b>Downloads</b>
       ${downloads}
     </p>
-  </div>
-</a>`;
+  </div></a>`;
     })
     .join('');
 
@@ -44,15 +47,28 @@ const imagesRendering = obj => {
   }
 
   refs.gallery.innerHTML = imageCard;
-
-  // console.log(refs.card);
 };
 
 const submit = e => {
   e.preventDefault();
   const inputValue = e.currentTarget.elements.searchQuery.value;
 
-  fetchImages(inputValue).then(images => imagesRendering(images));
+  fetchImages(inputValue).then(images => {
+    {
+      imagesRendering(images);
+      console.log(images);
+    }
+  });
+
+  // const { height: cardHeight } = refs.gallery.firstElementChild.getBoundingClientRect();
+
+  // console.log(height);
 };
 
 refs.form.addEventListener('submit', submit);
+
+let simplLightboxGallery = new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionsData: 'alt',
+  captionDelay: 250,
+});
