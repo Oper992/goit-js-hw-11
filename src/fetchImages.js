@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-export async function fetchImages(name) {
+export async function fetchImages(name, page) {
   const parameters = new URLSearchParams({
     key: '26236897-1332e9e9dbdbc4080cdf2cc84',
     q: name,
@@ -8,6 +8,7 @@ export async function fetchImages(name) {
     orientation: 'horizontal',
     safesearch: 'true',
     per_page: 40,
+    page: page,
   });
 
   try {

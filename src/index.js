@@ -7,14 +7,14 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const refs = {
   form: document.querySelector('#search-form'),
   gallery: document.querySelector('.gallery'),
+  loadMoreBtn: document.querySelector('.load-more'),
 };
 
-
-
-
+let page = 1;
+let inputValue = '';
 
 const imagesRendering = obj => {
-  const imageCard = obj.data.hits
+  const markup = obj.data.hits
     .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
       return `<a class="gallery__item" href = "${largeImageURL}">
   <img src="${webformatURL}" alt="${tags}" loading="lazy" width = "370px"/>
@@ -46,26 +46,37 @@ const imagesRendering = obj => {
     return;
   }
 
-  refs.gallery.innerHTML = imageCard;
+  if (page === 1) {
+    refs.gallery.innerHTML = markup;
+  } else {
+    refs.gallery.insertAdjacentHTML('beforeend', markup);
+  }
 };
 
-const submit = e => {
+async function submit(e) {
   e.preventDefault();
-  const inputValue = e.currentTarget.elements.searchQuery.value;
+  inputValue = e.currentTarget.elements.searchQuery.value;
 
-  fetchImages(inputValue).then(images => {
-    {
-      imagesRendering(images);
-      console.log(images);
-    }
-  });
+  page = 1;
 
-  // const { height: cardHeight } = refs.gallery.firstElementChild.getBoundingClientRect();
+  const images = await fetchImages(inputValue, page);
 
-  // console.log(height);
-};
+  imagesRendering(images);
+
+  refs.loadMoreBtn.classList.add('visually-hidden');
+  refs.loadMoreBtn.classList.remove('visually-hidden');
+}
+
+async function loadMore() {
+  page += 1;
+
+  const images = await fetchImages(inputValue, page);
+
+  imagesRendering(images);
+}
 
 refs.form.addEventListener('submit', submit);
+refs.loadMoreBtn.addEventListener('click', loadMore);
 
 let simplLightboxGallery = new SimpleLightbox('.gallery a', {
   captions: true,
