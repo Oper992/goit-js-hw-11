@@ -8,6 +8,16 @@ header {
 main {
   padding-bottom: 60px;
 }
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+b {
+  display: block;
+  margin-bottom: 5px;
+}
 .container {
   padding: 0 15px;
   width: 100%;
@@ -16,9 +26,21 @@ main {
 
 .search-form {
   display: flex;
-  height: 90px;
+  height: 50px;
   justify-content: center;
   align-items: center;
+}
+
+.submit-btn {
+  font-weight: 600;
+  color: #382b22;
+  background: white;
+  border-radius: 4px;
+  height: 30px;
+
+  &:hover {
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.15);
+  }
 }
 
 button {
@@ -33,11 +55,11 @@ button {
   font-family: inherit;
 }
 button.btn {
-  font-weight: 600;
-  color: #382b22;
+  font-weight: 500;
+  color: white;
   text-transform: uppercase;
   padding: 5px 5px;
-  background: white;
+  background: #4169e1;
   border: 2px solid grey;
   border-radius: 0.75em;
   transition: transform 0.15s;
@@ -54,17 +76,16 @@ button.btn::before {
   bottom: 0;
   background: white;
   border-radius: inherit;
-  box-shadow: 0 0 0 2px gray, 0 0.625em 0 0 #dcdcdc;
+  box-shadow: 0 0 0 2px gray, 0 0.625em 0 0 darkgray;
   transform: translate3d(0, 0.75em, -1em);
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
 button.btn:hover {
-  background: white;
   transform: translate(0, 0.25em);
 }
 button.btn:hover::before {
-  box-shadow: 0 0 0 2px gray, 0 0.5em 0 0 #dcdcdc;
+  box-shadow: 0 0 0 2px gray, 0 0.5em 0 0 darkgray;
   transform: translate3d(0, 0.5em, -1em);
 }
 button.btn:active {
@@ -108,6 +129,9 @@ input {
 
 .gallery__item {
   flex-basis: calc((100% / 4) - 30px);
+  margin-bottom: 30px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.12), 0px 4px 4px rgba(0, 0, 0, 0.06),
+    1px 4px 6px rgba(0, 0, 0, 0.16);
 }
 
 .info {
@@ -115,12 +139,3 @@ input {
   justify-content: space-around;
 }
 
-.info-item {
-  text-align: center;
-}
-
-// .load-more {
-
-//   background-color: #4169e1;
-//   color: white;
-// }

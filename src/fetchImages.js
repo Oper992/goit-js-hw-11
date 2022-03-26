@@ -13,6 +13,7 @@ export async function fetchImages(name, page) {
 
   try {
     const response = await axios.get(`https://pixabay.com/api/?${parameters}`);
+
     return response;
   } catch (error) {
     console.error(error);

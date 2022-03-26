@@ -3,6 +3,7 @@ import { fetchImages } from './fetchImages';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import InfiniteAjaxScroll from '@webcreate/infinite-ajax-scroll';
 
 const refs = {
   form: document.querySelector('#search-form'),
@@ -39,13 +40,6 @@ const imagesRendering = obj => {
     })
     .join('');
 
-  if (obj.data.hits.length === 0) {
-    Notiflix.Notify.info(
-      'Sorry, there are no images matching your search query. Please try again.',
-    );
-    return;
-  }
-
   if (page === 1) {
     refs.gallery.innerHTML = markup;
   } else {
@@ -61,10 +55,33 @@ async function submit(e) {
 
   const images = await fetchImages(inputValue, page);
 
+  if (images.data.hits.length === 0) {
+    Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.',
+    );
+    refs.gallery.innerHTML = '';
+    return;
+  } else {
+    Notiflix.Notify.info(`Hooray! We found ${images.data.totalHits} images.`);
+  }
+
   imagesRendering(images);
+
+  if (images.data.totalHits <= document.querySelectorAll('a').length) {
+    refs.loadMoreBtn.classList.add('visually-hidden');
+    return;
+  }
+
+  let simplLightboxGallery = new SimpleLightbox('.gallery a', {});
 
   refs.loadMoreBtn.classList.add('visually-hidden');
   refs.loadMoreBtn.classList.remove('visually-hidden');
+
+  let ias = new InfiniteAjaxScroll('.gallery', {
+    item: '.gallery__item',
+    next: '.next',
+    pagination: '.pagination'
+  });
 }
 
 async function loadMore() {
@@ -73,13 +90,19 @@ async function loadMore() {
   const images = await fetchImages(inputValue, page);
 
   imagesRendering(images);
+
+  if (images.data.totalHits <= document.querySelectorAll('a').length) {
+    refs.loadMoreBtn.classList.add('visually-hidden');
+    Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+
+    return;
+  }
+
+  let simplLightboxGallery = new SimpleLightbox('.gallery a', {});
+
+  // console.log(images.data.totalHits);
+  // console.log(document.querySelectorAll('a').length);
 }
 
 refs.form.addEventListener('submit', submit);
 refs.loadMoreBtn.addEventListener('click', loadMore);
-
-let simplLightboxGallery = new SimpleLightbox('.gallery a', {
-  captions: true,
-  captionsData: 'alt',
-  captionDelay: 250,
-});
