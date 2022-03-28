@@ -3,7 +3,7 @@ import { fetchImages } from './fetchImages';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import InfiniteAjaxScroll from '@webcreate/infinite-ajax-scroll';
+var throttle = require('lodash.throttle');
 
 const refs = {
   form: document.querySelector('#search-form'),
@@ -63,6 +63,7 @@ async function submit(e) {
     return;
   } else {
     Notiflix.Notify.info(`Hooray! We found ${images.data.totalHits} images.`);
+    setTimeout(() => Notiflix.Notify.info(`А так же Путин ху*ло!`), 3000);
   }
 
   imagesRendering(images);
@@ -76,12 +77,6 @@ async function submit(e) {
 
   refs.loadMoreBtn.classList.add('visually-hidden');
   refs.loadMoreBtn.classList.remove('visually-hidden');
-
-  let ias = new InfiniteAjaxScroll('.gallery', {
-    item: '.gallery__item',
-    next: '.next',
-    pagination: '.pagination'
-  });
 }
 
 async function loadMore() {
@@ -104,5 +99,27 @@ async function loadMore() {
   // console.log(document.querySelectorAll('a').length);
 }
 
+async function endlessLoading(e) {
+  let windowRelativeBottom = document.documentElement.getBoundingClientRect().bottom;
+
+  if (windowRelativeBottom < document.documentElement.clientHeight + 100) {
+    page += 1;
+
+    const images = await fetchImages(inputValue, page);
+
+    imagesRendering(images);
+
+    if (images.data.totalHits <= document.querySelectorAll('a').length) {
+      Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
+  
+      window.removeEventListener("scroll", endlessLoading)
+    }
+  }
+  
+  let simplLightboxGallery = new SimpleLightbox('.gallery a', {});
+  console.log(windowRelativeBottom);
+}
+
 refs.form.addEventListener('submit', submit);
 refs.loadMoreBtn.addEventListener('click', loadMore);
+window.addEventListener('scroll', throttle(endlessLoading, 500));
