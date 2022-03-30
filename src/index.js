@@ -3,6 +3,7 @@ import { fetchImages } from './fetchImages';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import { remove } from 'lodash';
 var throttle = require('lodash.throttle');
 
 const refs = {
@@ -13,8 +14,9 @@ const refs = {
 
 let page = 1;
 let inputValue = '';
+let offScroll = false;
 
-const imagesRendering = obj => {
+const imagesRendering = async obj => {
   const markup = obj.data.hits
     .map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => {
       return `<a class="gallery__item" href = "${largeImageURL}">
@@ -52,6 +54,7 @@ async function submit(e) {
   inputValue = e.currentTarget.elements.searchQuery.value;
 
   page = 1;
+  offScroll = false;
 
   const images = await fetchImages(inputValue, page);
 
@@ -63,7 +66,7 @@ async function submit(e) {
     return;
   } else {
     Notiflix.Notify.info(`Hooray! We found ${images.data.totalHits} images.`);
-    setTimeout(() => Notiflix.Notify.info(`А так же Путин ху*ло!`), 3000);
+    setTimeout(() => Notiflix.Notify.info(`Слава ЗСУ!`), 3000);
   }
 
   imagesRendering(images);
@@ -75,8 +78,8 @@ async function submit(e) {
 
   let simplLightboxGallery = new SimpleLightbox('.gallery a', {});
 
-  refs.loadMoreBtn.classList.add('visually-hidden');
-  refs.loadMoreBtn.classList.remove('visually-hidden');
+  // refs.loadMoreBtn.classList.add('visually-hidden');
+  // refs.loadMoreBtn.classList.remove('visually-hidden');
 }
 
 async function loadMore() {
@@ -99,26 +102,27 @@ async function loadMore() {
   // console.log(document.querySelectorAll('a').length);
 }
 
-async function endlessLoading(e) {
+const endlessLoading = async e => {
   let windowRelativeBottom = document.documentElement.getBoundingClientRect().bottom;
 
-  if (windowRelativeBottom < document.documentElement.clientHeight + 100) {
+  if (windowRelativeBottom < document.documentElement.clientHeight + 100 && !offScroll) {
     page += 1;
 
     const images = await fetchImages(inputValue, page);
 
-    imagesRendering(images);
+    await imagesRendering(images);
 
     if (images.data.totalHits <= document.querySelectorAll('a').length) {
       Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
-  
-      window.removeEventListener("scroll", endlessLoading)
+
+      offScroll = true;
     }
   }
-  
+
   let simplLightboxGallery = new SimpleLightbox('.gallery a', {});
-  console.log(windowRelativeBottom);
-}
+  // console.log(windowRelativeBottom);
+};
+
 
 refs.form.addEventListener('submit', submit);
 refs.loadMoreBtn.addEventListener('click', loadMore);
