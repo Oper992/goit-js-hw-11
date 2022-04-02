@@ -31,7 +31,8 @@ b {
   align-items: center;
 }
 
-.submit-btn {
+.submit-btn,
+.switch {
   font-weight: 600;
   color: #382b22;
   background: white;
@@ -139,3 +140,7 @@ input {
   justify-content: space-around;
 }
 
+.switch {
+  margin-right: 10px;
+  color: red;
+}

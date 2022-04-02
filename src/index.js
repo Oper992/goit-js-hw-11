@@ -10,6 +10,7 @@ const refs = {
   form: document.querySelector('#search-form'),
   gallery: document.querySelector('.gallery'),
   loadMoreBtn: document.querySelector('.load-more'),
+  onOffLoadMoreBtn: document.querySelector('.switch'),
 };
 
 let page = 1;
@@ -54,7 +55,7 @@ async function submit(e) {
   inputValue = e.currentTarget.elements.searchQuery.value;
 
   page = 1;
-  offScroll = false;
+  refs.loadMoreBtn.classList.contains('visually-hidden') ? (offScroll = false) : (offScroll = true);
 
   const images = await fetchImages(inputValue, page);
 
@@ -78,8 +79,12 @@ async function submit(e) {
 
   let simplLightboxGallery = new SimpleLightbox('.gallery a', {});
 
-  // refs.loadMoreBtn.classList.add('visually-hidden');
-  // refs.loadMoreBtn.classList.remove('visually-hidden');
+  const { height: formHeight } = refs.form.firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: formHeight * 2,
+    behavior: 'smooth',
+  });
 }
 
 async function loadMore() {
@@ -98,8 +103,14 @@ async function loadMore() {
 
   let simplLightboxGallery = new SimpleLightbox('.gallery a', {});
 
-  // console.log(images.data.totalHits);
-  // console.log(document.querySelectorAll('a').length);
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
 }
 
 const endlessLoading = async e => {
@@ -112,6 +123,15 @@ const endlessLoading = async e => {
 
     await imagesRendering(images);
 
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+
     if (images.data.totalHits <= document.querySelectorAll('a').length) {
       Notiflix.Notify.info("We're sorry, but you've reached the end of search results.");
 
@@ -120,10 +140,21 @@ const endlessLoading = async e => {
   }
 
   let simplLightboxGallery = new SimpleLightbox('.gallery a', {});
-  // console.log(windowRelativeBottom);
 };
 
+const loadMoreBtnSwitcher = () => {
+  if (refs.loadMoreBtn.classList.contains('visually-hidden')) {
+    refs.loadMoreBtn.classList.remove('visually-hidden');
+    refs.onOffLoadMoreBtn.style.color = 'green';
+    offScroll = true;
+  } else {
+    refs.loadMoreBtn.classList.add('visually-hidden');
+    refs.onOffLoadMoreBtn.style.color = 'red';
+    offScroll = false;
+  }
+};
 
 refs.form.addEventListener('submit', submit);
 refs.loadMoreBtn.addEventListener('click', loadMore);
 window.addEventListener('scroll', throttle(endlessLoading, 500));
+refs.onOffLoadMoreBtn.addEventListener('click', loadMoreBtnSwitcher);
